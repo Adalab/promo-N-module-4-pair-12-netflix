@@ -1,13 +1,31 @@
 const express = require('express');
 const cors = require('cors');
+const { response } = require('express');
 
 // create and config server
 
 const server = express();
 server.use(cors());
 server.use(express.json());
-server.get("/movies", (req,res)=>{
-//res.
+server.get("/movies", (req,res)=>{ 
+  console.log('estoy en la url de movies')
+  res.json({
+    success: true,
+    movies: [
+      {
+        id: '1',
+        title: 'Gambita de dama',
+        gender: 'Drama',
+        image: 'https://via.placeholder.com/150'
+      },
+      {
+        id: '2',
+        title: 'Friends',
+        gender: 'Comedia',
+        image: 'https://via.placeholder.com/150'
+      }
+    ]
+  })
 })
 // init express aplication
 const serverPort = 4000;
