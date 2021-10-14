@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const movies = require('./data/movies.json');
 
+
 // create and config server
 const server = express();
 server.use(cors());
@@ -19,6 +20,16 @@ server.get('/movies', (req, res) => {
   console.log('estoy en la url de movies');
   res.json(movies);
 });
+
+server.get('/movie/:movieId', (req, res) => {
+  console.log('Url params:', req.params);
+  console.log('Url param promoId:', req.params.movieId);
+
+    // find movie by movieId
+    const movie = movies.movies.find(movie => movie.id === parseInt(req.params.movieId));
+    console.log('Found movie:', movie);
+  
+})
 
 // Configuración del servidor de estáticos
 const staticServerPathWeb = './public';
