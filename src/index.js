@@ -4,63 +4,88 @@ const cors = require('cors');
 const movies = require('./data/movies.json');
 const Database = require('better-sqlite3');
 
-// create and config server
+// * create and config server
 const server = express();
 server.use(cors());
 server.use(express.json());
 
-// init express aplication
+// * init express aplication
 const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
-// init and config data base
+// * init and config data base
 const db = new Database('./src/data/database.db', {
   // this line log in console all data base queries
   verbose: console.log,
 });
 
-// API request > GET > http://localhost:4000/movies
+// * API request > GET > http://localhost:4000/movies
 server.get('/movies', (req, res) => {
-  const query = db.prepare(`SELECT * FROM movies`);
+  // Código para traer la info de la base de datos
+  const query = db.prepare('SELECT * FROM movies');
+  // ejecucion de la query
   const moviesData = query.all();
+  // respuesta, con los datos de movies
   res.json({ movies: moviesData });
 });
 
+// * endpoint para peliculas individuales
 server.get('/movie/:movieId', (req, res) => {
-  console.log('Url params:', req.params);
-  console.log('Url param promoId:', req.params.movieId);
-
   // find movie by movieId
   const movie = movies.movies.find(
     (movie) => movie.id === parseInt(req.params.movieId)
   );
-  console.log('Found movie:', movie);
-});
 
-// Endpoint gestionar las peticiones sign-up
-server.post('/sign-up', (req, res) => {
-  const email = req.body.email;
-  const pass = req.body.password;
-
-  if (email === '' || email === undefined || pass === '' || pass == undefined) {
-    res.json({
-      error: true,
-      message: 'debe enviar todos los datos',
-    });
+  // respuesta con los datos de las peliculas.
+  if (movie === undefined) {
+    res.json({ error: 'Pelicula no encontrada 🤷‍♀️' });
+  } else {
+    res.json({result: 'success', name: movie.title, gender: movie.gender });
   }
 });
-server.get('/user/movies', (req, res) => {
-  const idUser = req.header('userId');
-  console.log(idUser);
+
+// * endpoint gestionar las peticiones sign-up
+// fake user new data base
+const userNew = [];
+// endpoing sign-up
+server.post('/sign-up', (req, res) => {
+  console.log('Body params:', req.body);
+  console.log('Body param email:', req.body.email);
+  console.log('Body param password:', req.body.password);
+  
+  // se reciben los datos del front:
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // se añade info a la base data base
+  userNew.push({
+    email: email,
+    password: password
+  })
+  
+  // respuesta de los datos al front, si fue o no fue exitosa la solicitud
+  res.json({
+    result: 'User created',
+    data: userNew
+  });
+
 });
 
-// Configuración del servidor de estáticos
-const staticServerPathWeb = './public';
-server.use(express.static(staticServerPathWeb));
+// * endpoint para favoritos de las usuarias
+server.get('/user/movies', (req, res) => {
+  // se trae el dato introducido por el front
+  const userId = req.header('userId');
 
-// Endpoint para gestionar los errores 404
+  // respuesta si la usuaria ha sido encontrada
+  res.json({
+    result: 'success',
+    id: userId
+  })
+});
+
+// * endpoint para gestionar los errores 404
 server.get('*', (req, res) => {
   // Relativo a este directorio
   const notFoundFileRelativePath = '../web/404-not-found.html';
@@ -70,3 +95,8 @@ server.get('*', (req, res) => {
   );
   res.status(404).sendFile(notFoundFileAbsolutePath);
 });
+
+// * Configuración del servidor de estáticos 
+// pendiente por terminar ...
+const staticServerPathWeb = './public';
+server.use(express.static(staticServerPathWeb));
