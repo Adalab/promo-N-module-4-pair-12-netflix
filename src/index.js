@@ -25,8 +25,7 @@ const db = new Database('./src/data/database.db', {
 server.get('/movies', (req, res) => {
   const query = db.prepare(`SELECT * FROM movies`);
   const moviesData = query.all();
-  res.json({ movies: moviesData }
-  );
+  res.json({ movies: moviesData });
 });
 
 server.get('/movie/:movieId', (req, res) => {
@@ -45,36 +44,17 @@ server.post('/sign-up', (req, res) => {
   const email = req.body.email;
   const pass = req.body.password;
 
-  if (email === "" || email === undefined || pass === "" || pass == undefined) {
+  if (email === '' || email === undefined || pass === '' || pass == undefined) {
     res.json({
       error: true,
-      message: "debe enviar todos los datos"
+      message: 'debe enviar todos los datos',
     });
-  } 
-  
-  //else {
-    //usuario existe 
-    //const querySelectUser = db.prepare("SELECT * FROM users WHERE email = ?");
-    //const userFound = querySelectUser.get(email);
-
-    //condicional 
-    /*
-    if (userFound === undefined) {
-      const query = db.prepare("INSERT  into users(email, pass) values (?,?);");
-      const userInsert = query.run(email, pass);
-      res.json({
-        error: false,
-        userId: userInsert.lastInsertRowid
-      });
-    } else {
-      res.json({
-        error: true,
-        message: "usuario ya existe"
-      });
-    }
-    */
   }
-})
+});
+server.get('/user/movies', (req, res) => {
+  const idUser = req.header('userId');
+  console.log(idUser);
+});
 
 // Configuración del servidor de estáticos
 const staticServerPathWeb = './public';
